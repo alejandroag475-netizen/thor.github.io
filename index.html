@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Inteligente de Consulta y Análisis Operativo (SICAO)</title>
+    <title>SICAO - Sistema Inteligente de Consulta Operativa</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse para procesamiento rápido de CSV de Google Sheets -->
+    <!-- PapaParse para procesamiento instantáneo de CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         .glass-panel {
-            background: rgba(15, 23, 42, 0.85);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
@@ -36,11 +36,11 @@
             </div>
             <div>
                 <h1 class="text-lg font-bold tracking-wide text-white">SICAO INTELIGENTE</h1>
-                <p class="text-xs text-slate-400">Base de Datos Multifuente en Tiempo Real</p>
+                <p class="text-xs text-slate-400">Plataforma Multifuente de Inteligencia (9 Bases Activas)</p>
             </div>
         </div>
 
-        <!-- Estatus de Sincronización y Usuario -->
+        <!-- Estatus y Control de Sesión -->
         <div id="navRight" class="flex items-center space-x-4">
             <div id="syncBadge" class="hidden items-center space-x-2 text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full">
                 <span class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
@@ -64,7 +64,7 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow flex flex-col p-4 md:p-6 max-w-[1700px] w-full mx-auto space-y-6">
 
-        <!-- PANTALLA DE AUTH (LOGIN / REGISTRO) -->
+        <!-- PANTALLA DE ACCESO Y REGISTRO -->
         <div id="authSection" class="flex-grow flex items-center justify-center py-12">
             <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl space-y-6 border border-slate-800">
                 <div class="text-center space-y-2">
@@ -72,10 +72,9 @@
                         <i data-lucide="lock" class="w-8 h-8"></i>
                     </div>
                     <h2 id="authTitle" class="text-2xl font-bold text-white">Iniciar Sesión</h2>
-                    <p id="authSubtitle" class="text-xs text-slate-400">Accede a la plataforma inteligente de consulta</p>
+                    <p id="authSubtitle" class="text-xs text-slate-400">Ingresa tus credenciales para acceder a las bases de datos</p>
                 </div>
 
-                <!-- Formulario -->
                 <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
                     <div id="nameFieldGroup" class="hidden space-y-1">
                         <label class="text-xs font-semibold text-slate-300">Nombre Completo</label>
@@ -83,7 +82,7 @@
                     </div>
 
                     <div class="space-y-1">
-                        <label class="text-xs font-semibold text-slate-300">Usuario o Correo</label>
+                        <label class="text-xs font-semibold text-slate-300">Usuario</label>
                         <input type="text" id="authUser" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="admin / analista">
                     </div>
 
@@ -105,7 +104,7 @@
             </div>
         </div>
 
-        <!-- PANEL DE ADMINISTRACIÓN DE USUARIOS (MODAL / OVERLAY) -->
+        <!-- PANEL DE ADMINISTRACIÓN DE USUARIOS -->
         <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
             <div class="glass-panel w-full max-w-3xl rounded-2xl p-6 shadow-2xl border border-slate-700 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -137,36 +136,33 @@
             </div>
         </div>
 
-        <!-- PANEL DE CONTROL Y DASHBOARD PRINCIPAL (PROTEGIDO) -->
+        <!-- APP DASHBOARD Y CONSULTA -->
         <div id="appSection" class="hidden flex-grow flex flex-col space-y-6">
 
-            <!-- BARRA DE BÚSQUEDA MULTIFUENTE Y FILTROS -->
+            <!-- BÚSQUEDA Y FILTROS -->
             <div class="glass-panel p-5 rounded-2xl space-y-4 border border-slate-800 shadow-xl">
                 <div class="flex flex-col md:flex-row gap-3">
-                    <!-- Buscador inteligente -->
                     <div class="relative flex-grow">
                         <i data-lucide="search" class="absolute left-4 top-3.5 w-5 h-5 text-slate-400"></i>
                         <input type="text" id="globalSearchInput" oninput="debounceSearch()" placeholder="Buscar por Nombre, Apodo, Folio, Delito, Vehículo, Placa, Municipio, Coordenadas..." class="w-full bg-slate-900/90 border border-slate-700 rounded-xl pl-12 pr-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 shadow-inner transition">
                     </div>
 
-                    <!-- Botón Refrescar Tiempo Real -->
                     <button onclick="fetchAllDatasets()" class="flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-500 px-5 py-3 rounded-xl text-xs font-semibold text-white shadow-lg shadow-indigo-600/20 transition">
                         <i data-lucide="refresh-cw" class="w-4 h-4"></i>
                         <span>Actualizar Ahora</span>
                     </button>
                 </div>
 
-                <!-- Filtros Secundarios -->
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2 border-t border-slate-800/80 text-xs">
                     <div>
                         <label class="text-slate-400 block mb-1">Filtrar por Base de Datos:</label>
                         <select id="datasetFilter" onchange="applyFilters()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500">
-                            <option value="ALL">Todas las Fuentes (11 Links)</option>
+                            <option value="ALL">Todas las Fuentes (9 Links)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="text-slate-400 block mb-1">Visualización:</label>
+                        <label class="text-slate-400 block mb-1">Modo Vista:</label>
                         <div class="flex bg-slate-900 p-1 rounded-lg border border-slate-700">
                             <button id="btnViewCards" onclick="switchView('cards')" class="flex-1 py-1 rounded bg-indigo-600 text-white font-semibold text-center transition">Tarjetas</button>
                             <button id="btnViewTable" onclick="switchView('table')" class="flex-1 py-1 rounded text-slate-400 font-semibold text-center hover:text-white transition">Tabla</button>
@@ -191,28 +187,28 @@
                 </div>
             </div>
 
-            <!-- VISTA DE TARJETAS CON FOTOGRAFÍA -->
+            <!-- VISTA TARJETAS -->
             <div id="cardsViewContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <!-- Inyección Dinámica de Fichas -->
+                <!-- Inyección dinámica -->
             </div>
 
-            <!-- VISTA TABULAR MASIVA -->
+            <!-- VISTA TABULAR -->
             <div id="tableViewContainer" class="hidden glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="overflow-x-auto max-h-[650px] custom-scrollbar">
                     <table class="w-full text-xs text-left text-slate-300">
                         <thead class="bg-slate-900 text-slate-400 uppercase font-mono sticky top-0 z-10 border-b border-slate-800">
-                            <tr id="tableHeaderRow">
+                            <tr>
                                 <th class="p-3">Fuente</th>
                                 <th class="p-3">Fotografía</th>
                                 <th class="p-3">Sujeto / Nombre</th>
                                 <th class="p-3">Motivo / Delito</th>
                                 <th class="p-3">Fecha</th>
                                 <th class="p-3">Ubicación / Municipio</th>
-                                <th class="p-3 text-right">Detalle</th>
+                                <th class="p-3 text-right">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody" class="divide-y divide-slate-800/60">
-                            <!-- Inyección Dinámica de Filas -->
+                            <!-- Inyección dinámica -->
                         </tbody>
                     </table>
                 </div>
@@ -221,13 +217,13 @@
         </div>
     </main>
 
-    <!-- MODAL VISTA DETALLADA DEL OBJETIVO -->
+    <!-- MODAL VISTA DETALLADA DEL EXPEDIENTE -->
     <div id="detailModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-4xl max-h-[90vh] rounded-2xl p-6 shadow-2xl border border-slate-700 flex flex-col space-y-4 overflow-hidden">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center space-x-3">
                     <span id="modalDatasetBadge" class="px-2.5 py-1 bg-indigo-600/30 border border-indigo-500/50 text-indigo-300 font-mono text-xs rounded-full uppercase">Fuente</span>
-                    <h3 id="modalTitle" class="font-bold text-white text-lg">Ficha del Objetivo</h3>
+                    <h3 id="modalTitle" class="font-bold text-white text-lg">Detalle del Registro</h3>
                 </div>
                 <button onclick="closeModal()" class="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -235,9 +231,8 @@
             </div>
 
             <div class="flex-grow overflow-y-auto custom-scrollbar grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Foto Principal -->
                 <div class="space-y-3">
-                    <div class="aspect-square bg-slate-900 rounded-xl overflow-hidden border border-slate-700 flex items-center justify-center relative group">
+                    <div class="aspect-square bg-slate-900 rounded-xl overflow-hidden border border-slate-700 flex items-center justify-center relative">
                         <img id="modalImg" src="" alt="Sin Imagen" class="w-full h-full object-cover hidden">
                         <div id="modalImgFallback" class="flex flex-col items-center text-slate-500">
                             <i data-lucide="user-x" class="w-12 h-12 mb-1"></i>
@@ -246,7 +241,6 @@
                     </div>
                 </div>
 
-                <!-- Campos y Datos Inteligentes -->
                 <div class="md:col-span-2 space-y-3">
                     <div id="modalFieldsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                         <!-- Campos Dinámicos -->
@@ -256,24 +250,21 @@
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL LÓGICA -->
+    <!-- LÓGICA DE APLICACIÓN -->
     <script>
-        // CONFIGURACIÓN DE LAS 11 FUENTES EN GOOGLE SHEETS
+        // CONFIGURACIÓN DE LOS 9 LINKS DE GOOGLE SHEETS ACTUALIZADOS
         const DATASETS = [
-            { id: 'DS1', title: 'SIOP (IPH / Detenidos)', url: 'https://docs.google.com/spreadsheets/d/1I8IYqBXEm4QrudMw-JeIEcIr0etmET70/export?format=csv&gid=1731516766' },
-            { id: 'DS2', title: 'Identificados Actualizado', url: 'https://docs.google.com/spreadsheets/d/1jGTU5qegO0SMm5Cw6rDdqWMpmmPYbGie/export?format=csv&gid=1282705637' },
-            { id: 'DS3', title: 'Detenidos Robo', url: 'https://docs.google.com/spreadsheets/d/1ljVSyZ_UE7Efc2G1UE_Hr0qPbzP-HTRK/export?format=csv&gid=1932875393' },
-            { id: 'DS4', title: 'Detenidos Base 4', url: 'https://docs.google.com/spreadsheets/d/1tr2OcHip_dpWLnwLDmH4syg_L0m4VyD_/export?format=csv' },
-            { id: 'DS5', title: 'Barandilla 2019', url: 'https://docs.google.com/spreadsheets/d/1IEOqO_NKaOTjdTi_oDTofVASCd97kL6n/export?format=csv&gid=1707264901' },
-            { id: 'DS6', title: 'Barandilla 2016-2018', url: 'https://docs.google.com/spreadsheets/d/1qCIWytSM8_PrqVWhAR4NZb1Wl5Lhism_/export?format=csv&gid=1212499736' },
-            { id: 'DS7', title: 'Barandilla 2021', url: 'https://docs.google.com/spreadsheets/d/11c-96eLFkD8ZVnGInUs8c6eEGLDPYtPN/export?format=csv&gid=1775903580' },
-            { id: 'DS8', title: 'Detenidos Respuestas', url: 'https://docs.google.com/spreadsheets/d/10PU5bReY0LtH_ugQXE3SnCR-qdmZJpnzS1EQynUab_Q/export?format=csv&gid=338751008' },
-            { id: 'DS9', title: 'Abordamientos', url: 'https://docs.google.com/spreadsheets/d/1EgudaTwmNvHi8eKPMQbCz8eD6fKS1GdrIuIp_R-xVfk/export?format=csv&gid=501282295' },
-            { id: 'DS10', title: 'Base Abordamientos', url: 'https://docs.google.com/spreadsheets/d/1y9ef2PcnhtqzmbKNS0cfYqmEzn1lnAge2uGQQ4FyfxE/export?format=csv&gid=1855404627' },
-            { id: 'DS11', title: 'Detenciones PolProx', url: 'https://docs.google.com/spreadsheets/d/1rl28kCEfkpu9G7oly87NHw4_XGCsjWhSssMxa6Et9SY/export?format=csv&gid=1225183609' }
+            { id: 'DS1', title: 'Base Abordamientos (Respuestas)', url: 'https://docs.google.com/spreadsheets/d/1y9ef2PcnhtqzmbKNS0cfYqmEzn1lnAge2uGQQ4FyfxE/export?format=csv' },
+            { id: 'DS2', title: 'SIOP (IPH / Detenidos)', url: 'https://docs.google.com/spreadsheets/d/1I8IYqBXEm4QrudMw-JeIEcIr0etmET70/export?format=csv' },
+            { id: 'DS3', title: 'Detenidos (Respuestas)', url: 'https://docs.google.com/spreadsheets/d/10PU5bReY0LtH_ugQXE3SnCR-qdmZJpnzS1EQynUab_Q/export?format=csv' },
+            { id: 'DS4', title: 'Abordamientos', url: 'https://docs.google.com/spreadsheets/d/1EgudaTwmNvHi8eKPMQbCz8eD6fKS1GdrIuIp_R-xVfk/export?format=csv' },
+            { id: 'DS5', title: 'Identificados Actualizado', url: 'https://docs.google.com/spreadsheets/d/1jGTU5qegO0SMm5Cw6rDdqWMpmmPYbGie/export?format=csv' },
+            { id: 'DS6', title: 'Detenciones PolProx', url: 'https://docs.google.com/spreadsheets/d/1rl28kCEfkpu9G7oly87NHw4_XGCsjWhSssMxa6Et9SY/export?format=csv' },
+            { id: 'DS7', title: 'Proyecto de Empadronamiento', url: 'https://docs.google.com/spreadsheets/d/1xb_M4GhMBoco9qOxMqBOeOdwEBDF0Dyv3D85PUi0-q0/export?format=csv' },
+            { id: 'DS8', title: 'Barandilla Formato Nuevo 2019', url: 'https://docs.google.com/spreadsheets/d/1IEOqO_NKaOTjdTi_oDTofVASCd97kL6n/export?format=csv' },
+            { id: 'DS9', title: 'Barandilla 2016-2018', url: 'https://docs.google.com/spreadsheets/d/18yIgXP0KHrAOtPcGP0kOGGyijfaD-dTC/export?format=csv' }
         ];
 
-        // ESTADO GLOBAL
         let allRecords = [];
         let filteredRecords = [];
         let users = JSON.parse(localStorage.getItem('sicao_users')) || [
@@ -284,13 +275,12 @@
         let searchDebounceTimer = null;
         let currentViewMode = 'cards';
 
-        // INICIALIZACIÓN
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             populateDatasetDropdown();
             checkAuth();
             
-            // Sincronización periódica automática (cada 45 segundos)
+            // Sincronización automática en segundo plano cada 45 segundos
             setInterval(() => {
                 if(currentUser) fetchAllDatasets(true);
             }, 45000);
@@ -298,6 +288,7 @@
 
         function populateDatasetDropdown() {
             const select = document.getElementById('datasetFilter');
+            select.innerHTML = '<option value="ALL">Todas las Fuentes (9 Links)</option>';
             DATASETS.forEach(ds => {
                 const opt = document.createElement('option');
                 opt.value = ds.id;
@@ -306,7 +297,6 @@
             });
         }
 
-        // CONTROL DE SESIÓN
         function checkAuth() {
             if (currentUser) {
                 document.getElementById('authSection').classList.add('hidden');
@@ -338,7 +328,7 @@
         function toggleAuthMode() {
             isRegistering = !isRegistering;
             document.getElementById('authTitle').textContent = isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión';
-            document.getElementById('authSubtitle').textContent = isRegistering ? 'Solicita tu acceso al sistema' : 'Accede a la plataforma inteligente de consulta';
+            document.getElementById('authSubtitle').textContent = isRegistering ? 'Solicita tu acceso al sistema' : 'Ingresa tus credenciales para acceder a las bases de datos';
             document.getElementById('authSubmitBtn').textContent = isRegistering ? 'Registrarse' : 'Ingresar al Sistema';
             document.getElementById('toggleAuthBtn').textContent = isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate aquí';
             document.getElementById('nameFieldGroup').classList.toggle('hidden', !isRegistering);
@@ -367,7 +357,7 @@
                 localStorage.setItem('sicao_users', JSON.stringify(users));
                 currentUser = newUser;
                 localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
-                alert('Registro exitoso. Bienvenido.');
+                alert('Registro exitoso.');
                 checkAuth();
             } else {
                 const found = users.find(u => u.user.toLowerCase() === userVal.toLowerCase() && u.pass === passVal);
@@ -376,7 +366,7 @@
                     return;
                 }
                 if (!found.active) {
-                    alert('Tu cuenta está desactivada. Contacta al Administrador.');
+                    alert('Tu cuenta está desactivada.');
                     return;
                 }
                 currentUser = found;
@@ -391,7 +381,6 @@
             checkAuth();
         }
 
-        // ADMINISTRACIÓN DE USUARIOS
         function toggleAdminPanel() {
             const modal = document.getElementById('adminModal');
             modal.classList.toggle('hidden');
@@ -447,7 +436,6 @@
             }
         }
 
-        // MOTOR DE FETCHING Y PARSER EN TIEMPO REAL DESDE GOOGLE SHEETS
         async function fetchAllDatasets(isBackground = false) {
             const syncText = document.getElementById('syncText');
             if(!isBackground) syncText.textContent = 'Cargando Datos...';
@@ -477,9 +465,7 @@
             applyFilters();
         }
 
-        // NORMALIZACIÓN DE REGISTROS DE DIVERSAS HUELGAS/TABLAS
         function standardizeRow(row, ds, index) {
-            // Extracción inteligente de Foto (Google Drive Links)
             let photoUrl = '';
             for(let key in row) {
                 const val = String(row[key] || '');
@@ -492,17 +478,13 @@
                 }
             }
 
-            // Normalizador de Nombre
-            const name = row['NOMBRE COMPLETO DEL DETENIDO'] || row['NOMBRE DEL DETENIDO'] || row['NOMBRE COMPLETO'] || row['NOMBRE'] || row['IDENTIFICADO(S)'] || row['DETENIDO'] || row['Nombre Det.:'] || row['Nombre'] || 'SIN NOMBRE REGISTRADO';
+            const name = row['NOMBRE COMPLETO DEL DETENIDO'] || row['NOMBRE DEL DETENIDO'] || row['NOMBRE DE DETENIDO CORRECT'] || row['NOMBRE COMPLETO'] || row['NOMBRE'] || row['IDENTIFICADO(S)'] || row['DETENIDO'] || row['Nombre Det.:'] || 'SIN NOMBRE REGISTRADO';
             
-            // Normalizador de Motivo / Delito
-            const reason = row['DELITO(S)'] || row['DELITO O FALTA'] || row['MOTIVO DE LA DETENCION IPH'] || row['MOTIVO DE DETENCION JUEZ CALIFICADOR'] || row['MOTIVO DE DETENCION'] || row['FALTA O DELITO'] || row['Delito:'] || row['Falta:'] || row['HECHOS'] || 'SIN MOTIVO ESPECIFICADO';
+            const reason = row['DELITO(S)'] || row['DELITO O FALTA'] || row['MOTIVO DE LA DETENCION IPH'] || row['MOTIVO DE DETENCION JUEZ CALIFICADOR'] || row['MOTIVO DE DETENCION'] || row['TIPO DE DETENCION'] || row['FALTA O DELITO'] || row['Delito:'] || row['Falta:'] || row['HECHOS'] || 'SIN MOTIVO ESPECIFICADO';
 
-            // Normalizador de Fecha
             const date = row['FECHA'] || row['FECHA DETENCION'] || row['FECHA DE DETENCIÓN'] || row['FECHA DE HOY'] || row['Marca temporal'] || 'S/F';
 
-            // Normalizador de Ubicación
-            const location = row['LUGAR'] || row['LUGAR DE DETENCION'] || row['MUNICIPIO'] || row['DIRECCION DEL DETENIDO COLONIA '] || row['COLONIA'] || row['Det. Colonia:'] || 'S/U';
+            const location = row['LUGAR'] || row['LUGAR DE DETENCION'] || row['LUGAR DE DETENCIÓN'] || row['MUNICIPIO'] || row['DIRECCION DEL DETENIDO COLONIA '] || row['COLONIA'] || 'S/U';
 
             return {
                 _id: `${ds.id}_${index}`,
@@ -517,7 +499,6 @@
             };
         }
 
-        // FILTRADO Y BÚSQUEDA UNIVERSAL
         function debounceSearch() {
             clearTimeout(searchDebounceTimer);
             searchDebounceTimer = setTimeout(applyFilters, 250);
@@ -529,18 +510,12 @@
             const photoOnly = document.getElementById('photoOnlyFilter').value;
 
             filteredRecords = allRecords.filter(r => {
-                // Filtro por fuente
                 if (selectedDs !== 'ALL' && r.datasetId !== selectedDs) return false;
-
-                // Filtro por foto
                 if (photoOnly === 'YES' && !r.photoUrl) return false;
-
-                // Búsqueda Inteligente Global en todos los campos del JSON
                 if (query) {
                     const textContent = JSON.stringify(r.raw).toLowerCase();
                     return textContent.includes(query);
                 }
-
                 return true;
             });
 
@@ -571,7 +546,7 @@
             const container = document.getElementById('cardsViewContainer');
             container.innerHTML = '';
 
-            const slice = filteredRecords.slice(0, 100); // Límite de optimización de renderizado
+            const slice = filteredRecords.slice(0, 100);
 
             if(slice.length === 0) {
                 container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium">No se encontraron registros coincidentes.</div>`;
@@ -645,7 +620,6 @@
             lucide.createIcons();
         }
 
-        // DETALLE EXPEDIENTE OBJETIVO
         function openDetailModal(record) {
             document.getElementById('modalDatasetBadge').textContent = record.datasetTitle;
             document.getElementById('modalTitle').textContent = record.name;
@@ -665,7 +639,6 @@
             const fieldsContainer = document.getElementById('modalFieldsContainer');
             fieldsContainer.innerHTML = '';
 
-            // Mostrar todos los atributos del CSV
             Object.entries(record.raw).forEach(([key, val]) => {
                 if(val && val.trim() !== '') {
                     const div = document.createElement('div');
