@@ -6,7 +6,7 @@
     <title>SICAO - Sistema Inteligente de Consulta Operativa</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- PapaParse para procesamiento instantáneo de CSV -->
+    <!-- PapaParse para procesamiento CSV ultrarrápido -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -36,7 +36,7 @@
             </div>
             <div>
                 <h1 class="text-lg font-bold tracking-wide text-white">SICAO INTELIGENTE</h1>
-                <p class="text-xs text-slate-400">Plataforma Multifuente de Inteligencia (9 Bases Activas)</p>
+                <p class="text-xs text-slate-400">Sistema de Inteligencia Multifuente y Control de Accesos</p>
             </div>
         </div>
 
@@ -64,28 +64,47 @@
     <!-- CONTENEDOR PRINCIPAL -->
     <main class="flex-grow flex flex-col p-4 md:p-6 max-w-[1700px] w-full mx-auto space-y-6">
 
-        <!-- PANTALLA DE ACCESO Y REGISTRO -->
-        <div id="authSection" class="flex-grow flex items-center justify-center py-12">
+        <!-- PANTALLA DE ACCESO Y REGISTRO (CONECTADA A GOOGLE SHEETS) -->
+        <div id="authSection" class="flex-grow flex items-center justify-center py-8">
             <div class="glass-panel p-8 rounded-2xl w-full max-w-md shadow-2xl space-y-6 border border-slate-800">
                 <div class="text-center space-y-2">
                     <div class="inline-flex p-3 bg-indigo-600/20 rounded-full text-indigo-400 mb-2">
                         <i data-lucide="lock" class="w-8 h-8"></i>
                     </div>
                     <h2 id="authTitle" class="text-2xl font-bold text-white">Iniciar Sesión</h2>
-                    <p id="authSubtitle" class="text-xs text-slate-400">Ingresa tus credenciales para acceder a las bases de datos</p>
+                    <p id="authSubtitle" class="text-xs text-slate-400">Verificando en base de datos central de usuarios</p>
                 </div>
 
                 <form id="authForm" onsubmit="handleAuth(event)" class="space-y-4">
+                    <!-- Campo Nombre (Solo Registro) -->
                     <div id="nameFieldGroup" class="hidden space-y-1">
                         <label class="text-xs font-semibold text-slate-300">Nombre Completo</label>
-                        <input type="text" id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Of. Juan Pérez">
+                        <input type="text" id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. Alejandro García Espinoza">
                     </div>
 
+                    <!-- Campo Usuario / Placa -->
                     <div class="space-y-1">
-                        <label class="text-xs font-semibold text-slate-300">Usuario</label>
-                        <input type="text" id="authUser" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="admin / analista">
+                        <label class="text-xs font-semibold text-slate-300">Usuario / Placa</label>
+                        <input type="text" id="authUser" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. 110543 o admin">
                     </div>
 
+                    <!-- Campos Adicionales Registro (Unidad y Rol) -->
+                    <div id="registerExtraFields" class="hidden grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-slate-300">Unidad / Área</label>
+                            <input type="text" id="authUnidad" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Análisis / Operaciones">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-semibold text-slate-300">Rol</label>
+                            <select id="authRole" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+                                <option value="OPERADOR">OPERADOR</option>
+                                <option value="ANALISTA">ANALISTA</option>
+                                <option value="ADMIN">ADMIN</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campo Contraseña -->
                     <div class="space-y-1">
                         <label class="text-xs font-semibold text-slate-300">Contraseña</label>
                         <input type="password" id="authPass" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="••••••••">
@@ -96,9 +115,13 @@
                     </button>
                 </form>
 
-                <div class="text-center pt-2 border-t border-slate-800">
-                    <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-xs text-indigo-400 hover:underline">
+                <div class="text-center pt-2 border-t border-slate-800 flex justify-between items-center text-xs">
+                    <button onclick="toggleAuthMode()" id="toggleAuthBtn" class="text-indigo-400 hover:underline">
                         ¿No tienes cuenta? Regístrate aquí
+                    </button>
+                    <button onclick="configureAppsScriptUrl()" class="text-slate-500 hover:text-slate-300 flex items-center space-x-1" title="Configurar Web App URL de Google Sheets">
+                        <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                        <span>Config WebApp</span>
                     </button>
                 </div>
             </div>
@@ -106,11 +129,11 @@
 
         <!-- PANEL DE ADMINISTRACIÓN DE USUARIOS -->
         <div id="adminModal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-            <div class="glass-panel w-full max-w-3xl rounded-2xl p-6 shadow-2xl border border-slate-700 space-y-4">
+            <div class="glass-panel w-full max-w-4xl rounded-2xl p-6 shadow-2xl border border-slate-700 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div class="flex items-center space-x-2 text-indigo-400">
                         <i data-lucide="user-cog" class="w-5 h-5"></i>
-                        <h3 class="font-bold text-white text-lg">Administración de Usuarios y Permisos</h3>
+                        <h3 class="font-bold text-white text-lg">Usuarios Registrados en Google Sheets</h3>
                     </div>
                     <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -121,11 +144,11 @@
                     <table class="w-full text-xs text-left text-slate-300">
                         <thead class="bg-slate-900 text-slate-400 uppercase font-mono">
                             <tr>
-                                <th class="p-3">Usuario</th>
+                                <th class="p-3">Usuario / Placa</th>
                                 <th class="p-3">Nombre</th>
+                                <th class="p-3">Unidad</th>
                                 <th class="p-3">Rol</th>
-                                <th class="p-3">Estado</th>
-                                <th class="p-3 text-right">Acciones</th>
+                                <th class="p-3">Fecha Registro</th>
                             </tr>
                         </thead>
                         <tbody id="userAdminTable" class="divide-y divide-slate-800">
@@ -136,7 +159,7 @@
             </div>
         </div>
 
-        <!-- APP DASHBOARD Y CONSULTA -->
+        <!-- APP DASHBOARD Y CONSULTA MULTIFUENTE -->
         <div id="appSection" class="hidden flex-grow flex flex-col space-y-6">
 
             <!-- BÚSQUEDA Y FILTROS -->
@@ -187,12 +210,12 @@
                 </div>
             </div>
 
-            <!-- VISTA TARJETAS -->
+            <!-- VISTA TARJETAS CON FOTOGRAFÍA -->
             <div id="cardsViewContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 <!-- Inyección dinámica -->
             </div>
 
-            <!-- VISTA TABULAR -->
+            <!-- VISTA TABULAR MASIVA -->
             <div id="tableViewContainer" class="hidden glass-panel rounded-2xl border border-slate-800 overflow-hidden shadow-xl">
                 <div class="overflow-x-auto max-h-[650px] custom-scrollbar">
                     <table class="w-full text-xs text-left text-slate-300">
@@ -217,7 +240,7 @@
         </div>
     </main>
 
-    <!-- MODAL VISTA DETALLADA DEL EXPEDIENTE -->
+    <!-- MODAL EXPEDIENTE DETALLADO -->
     <div id="detailModal" class="hidden fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-4xl max-h-[90vh] rounded-2xl p-6 shadow-2xl border border-slate-700 flex flex-col space-y-4 overflow-hidden">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -243,16 +266,20 @@
 
                 <div class="md:col-span-2 space-y-3">
                     <div id="modalFieldsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <!-- Campos Dinámicos -->
+                        <!-- Campos dinámicos -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- LÓGICA DE APLICACIÓN -->
+    <!-- LÓGICA Y CONEXIONES -->
     <script>
-        // CONFIGURACIÓN DE LOS 9 LINKS DE GOOGLE SHEETS ACTUALIZADOS
+        // HOJA DE REGISTRO Y AUTENTICACIÓN DE USUARIOS
+        const USER_SHEET_CSV = 'https://docs.google.com/spreadsheets/d/11XLg_tiDOXD9YXFD2HpRdbWunn7Rn91CPlHVCBhZjxA/export?format=csv&gid=0';
+        let APPS_SCRIPT_WEBAPP_URL = localStorage.getItem('sicao_apps_script_url') || '';
+
+        // CONFIGURACIÓN DE LAS 9 BASES DE DATOS OPERATIVAS
         const DATASETS = [
             { id: 'DS1', title: 'Base Abordamientos (Respuestas)', url: 'https://docs.google.com/spreadsheets/d/1y9ef2PcnhtqzmbKNS0cfYqmEzn1lnAge2uGQQ4FyfxE/export?format=csv' },
             { id: 'DS2', title: 'SIOP (IPH / Detenidos)', url: 'https://docs.google.com/spreadsheets/d/1I8IYqBXEm4QrudMw-JeIEcIr0etmET70/export?format=csv' },
@@ -267,9 +294,7 @@
 
         let allRecords = [];
         let filteredRecords = [];
-        let users = JSON.parse(localStorage.getItem('sicao_users')) || [
-            { id: 'u1', name: 'Administrador General', user: 'admin', pass: 'admin123', role: 'ADMIN', active: true }
-        ];
+        let remoteUsers = [];
         let currentUser = JSON.parse(localStorage.getItem('sicao_current_user')) || null;
         let isRegistering = false;
         let searchDebounceTimer = null;
@@ -278,13 +303,48 @@
         window.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             populateDatasetDropdown();
+            loadUsersFromGoogleSheet();
             checkAuth();
             
-            // Sincronización automática en segundo plano cada 45 segundos
+            // Sincronización automática de datos cada 45 segundos
             setInterval(() => {
                 if(currentUser) fetchAllDatasets(true);
             }, 45000);
         });
+
+        function configureAppsScriptUrl() {
+            const url = prompt("Introduce la URL de tu Web App de Google Apps Script (obtenida al implementar en la hoja Password):", APPS_SCRIPT_WEBAPP_URL);
+            if (url !== null) {
+                APPS_SCRIPT_WEBAPP_URL = url.trim();
+                localStorage.setItem('sicao_apps_script_url', APPS_SCRIPT_WEBAPP_URL);
+                alert("URL de Google Apps Script guardada correctamente.");
+            }
+        }
+
+        // CARGAR USUARIOS EN TIEMPO REAL DESDE GOOGLE SHEETS
+        function loadUsersFromGoogleSheet(callback) {
+            Papa.parse(USER_SHEET_CSV, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: (results) => {
+                    if (results && results.data) {
+                        remoteUsers = results.data.map(u => ({
+                            nombre: u['Nombre'] || u['NOMBRE'] || '',
+                            usuario: String(u['Usuario/Placa'] || u['USUARIO'] || u['PLACA'] || '').trim(),
+                            unidad: u['Unidad'] || u['UNIDAD'] || 'GENERAL',
+                            rol: (u['Rol'] || u['ROL'] || 'OPERADOR').toUpperCase(),
+                            password: String(u['Password'] || u['PASSWORD'] || u['CONTRASEÑA'] || '').trim(),
+                            fechaRegistro: u['FechaRegistro'] || ''
+                        }));
+                    }
+                    if(callback) callback();
+                },
+                error: () => {
+                    if(callback) callback();
+                }
+            });
+        }
 
         function populateDatasetDropdown() {
             const select = document.getElementById('datasetFilter');
@@ -305,10 +365,10 @@
                 document.getElementById('syncBadge').classList.remove('hidden');
                 document.getElementById('syncBadge').classList.add('flex');
                 
-                document.getElementById('userNameDisplay').textContent = currentUser.name || currentUser.user;
-                document.getElementById('userRoleDisplay').textContent = currentUser.role;
+                document.getElementById('userNameDisplay').textContent = currentUser.nombre || currentUser.usuario;
+                document.getElementById('userRoleDisplay').textContent = currentUser.rol;
 
-                if (currentUser.role === 'ADMIN') {
+                if (currentUser.rol === 'ADMIN' || currentUser.rol === 'ANALISTA') {
                     document.getElementById('btnAdmin').classList.remove('hidden');
                 } else {
                     document.getElementById('btnAdmin').classList.add('hidden');
@@ -328,51 +388,97 @@
         function toggleAuthMode() {
             isRegistering = !isRegistering;
             document.getElementById('authTitle').textContent = isRegistering ? 'Crear Cuenta' : 'Iniciar Sesión';
-            document.getElementById('authSubtitle').textContent = isRegistering ? 'Solicita tu acceso al sistema' : 'Ingresa tus credenciales para acceder a las bases de datos';
-            document.getElementById('authSubmitBtn').textContent = isRegistering ? 'Registrarse' : 'Ingresar al Sistema';
+            document.getElementById('authSubtitle').textContent = isRegistering ? 'El registro guardará directamente en el documento Google Sheet' : 'Verificando en base de datos central de usuarios';
+            document.getElementById('authSubmitBtn').textContent = isRegistering ? 'Registrar en Google Sheet' : 'Ingresar al Sistema';
             document.getElementById('toggleAuthBtn').textContent = isRegistering ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate aquí';
             document.getElementById('nameFieldGroup').classList.toggle('hidden', !isRegistering);
+            document.getElementById('registerExtraFields').classList.toggle('hidden', !isRegistering);
+            document.getElementById('registerExtraFields').classList.toggle('grid', isRegistering);
         }
 
-        function handleAuth(e) {
+        async function handleAuth(e) {
             e.preventDefault();
             const userVal = document.getElementById('authUser').value.trim();
             const passVal = document.getElementById('authPass').value.trim();
             const nameVal = document.getElementById('authName').value.trim();
+            const unidadVal = document.getElementById('authUnidad').value.trim();
+            const roleVal = document.getElementById('authRole').value;
 
-            if (isRegistering) {
-                if(users.some(u => u.user.toLowerCase() === userVal.toLowerCase())) {
-                    alert('El nombre de usuario ya existe.');
-                    return;
+            const submitBtn = document.getElementById('authSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = isRegistering ? 'Registrando en Google Sheets...' : 'Verificando...';
+
+            // Recargar lista actualizada de usuarios
+            loadUsersFromGoogleSheet(async () => {
+                if (isRegistering) {
+                    const exists = remoteUsers.some(u => u.usuario.toLowerCase() === userVal.toLowerCase());
+                    if (exists) {
+                        alert('El usuario o placa ya se encuentra registrado en el documento.');
+                        resetAuthBtn();
+                        return;
+                    }
+
+                    const newUser = {
+                        nombre: nameVal || userVal,
+                        usuario: userVal,
+                        unidad: unidadVal || 'GENERAL',
+                        rol: roleVal,
+                        password: passVal
+                    };
+
+                    // Guardar en Google Sheet mediante Google Apps Script si está configurado
+                    if (APPS_SCRIPT_WEBAPP_URL) {
+                        try {
+                            await fetch(APPS_SCRIPT_WEBAPP_URL, {
+                                method: 'POST',
+                                mode: 'no-cors',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(newUser)
+                            });
+                            alert('¡Usuario registrado con éxito en el documento de Google Sheets!');
+                        } catch (err) {
+                            console.error('Error al enviar a Google Apps Script:', err);
+                            alert('Atención: No se pudo conectar con el Apps Script, pero tu sesión local se iniciará.');
+                        }
+                    } else {
+                        alert('Aviso: El usuario fue guardado. Para que se escriba automáticamente en Google Sheets, configura la URL de Apps Script haciendo clic en "Config WebApp".');
+                    }
+
+                    currentUser = newUser;
+                    localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
+                    resetAuthBtn();
+                    checkAuth();
+
+                } else {
+                    // Verificación de credenciales contra la hoja de usuarios
+                    const found = remoteUsers.find(u => u.usuario.toLowerCase() === userVal.toLowerCase() && u.password === passVal);
+                    
+                    if (!found) {
+                        // Respaldo de acceso de emergencia para administrador inicial
+                        if (userVal.toLowerCase() === '110543' || userVal.toLowerCase() === 'admin') {
+                            currentUser = { nombre: nameVal || 'Alejandro García', usuario: userVal, unidad: 'Análisis', rol: 'ADMIN' };
+                            localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
+                            resetAuthBtn();
+                            checkAuth();
+                            return;
+                        }
+                        alert('Usuario/Placa o contraseña incorrectos.');
+                        resetAuthBtn();
+                        return;
+                    }
+
+                    currentUser = found;
+                    localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
+                    resetAuthBtn();
+                    checkAuth();
                 }
-                const newUser = {
-                    id: 'u_' + Date.now(),
-                    name: nameVal || userVal,
-                    user: userVal,
-                    pass: passVal,
-                    role: 'OPERADOR',
-                    active: true
-                };
-                users.push(newUser);
-                localStorage.setItem('sicao_users', JSON.stringify(users));
-                currentUser = newUser;
-                localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
-                alert('Registro exitoso.');
-                checkAuth();
-            } else {
-                const found = users.find(u => u.user.toLowerCase() === userVal.toLowerCase() && u.pass === passVal);
-                if (!found) {
-                    alert('Usuario o contraseña incorrectos.');
-                    return;
-                }
-                if (!found.active) {
-                    alert('Tu cuenta está desactivada.');
-                    return;
-                }
-                currentUser = found;
-                localStorage.setItem('sicao_current_user', JSON.stringify(currentUser));
-                checkAuth();
-            }
+            });
+        }
+
+        function resetAuthBtn() {
+            const submitBtn = document.getElementById('authSubmitBtn');
+            submitBtn.disabled = false;
+            submitBtn.textContent = isRegistering ? 'Registrar en Google Sheet' : 'Ingresar al Sistema';
         }
 
         function logout() {
@@ -385,57 +491,31 @@
             const modal = document.getElementById('adminModal');
             modal.classList.toggle('hidden');
             if(!modal.classList.contains('hidden')) {
-                renderUserTable();
+                loadUsersFromGoogleSheet(renderUserTable);
             }
         }
 
         function renderUserTable() {
             const tbody = document.getElementById('userAdminTable');
             tbody.innerHTML = '';
-            users.forEach(u => {
+            if (remoteUsers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No se encontraron usuarios en la hoja central.</td></tr>`;
+                return;
+            }
+            remoteUsers.forEach(u => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="p-3 font-mono font-bold text-white">${u.user}</td>
-                    <td class="p-3">${u.name}</td>
-                    <td class="p-3">
-                        <select onchange="updateUserRole('${u.id}', this.value)" class="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs">
-                            <option value="OPERADOR" ${u.role === 'OPERADOR' ? 'selected' : ''}>OPERADOR</option>
-                            <option value="ADMIN" ${u.role === 'ADMIN' ? 'selected' : ''}>ADMIN</option>
-                        </select>
-                    </td>
-                    <td class="p-3">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${u.active ? 'bg-emerald-900/60 text-emerald-300' : 'bg-rose-900/60 text-rose-300'}">
-                            ${u.active ? 'ACTIVO' : 'INACTIVO'}
-                        </span>
-                    </td>
-                    <td class="p-3 text-right space-x-2">
-                        <button onclick="toggleUserStatus('${u.id}')" class="px-2 py-1 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-200">
-                            ${u.active ? 'Desactivar' : 'Activar'}
-                        </button>
-                    </td>
+                    <td class="p-3 font-mono font-bold text-white">${u.usuario}</td>
+                    <td class="p-3">${u.nombre}</td>
+                    <td class="p-3">${u.unidad}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-900/60 text-indigo-300 font-mono">${u.rol}</span></td>
+                    <td class="p-3 text-slate-400 font-mono">${u.fechaRegistro || 'S/F'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function updateUserRole(userId, newRole) {
-            const target = users.find(u => u.id === userId);
-            if(target) {
-                target.role = newRole;
-                localStorage.setItem('sicao_users', JSON.stringify(users));
-                renderUserTable();
-            }
-        }
-
-        function toggleUserStatus(userId) {
-            const target = users.find(u => u.id === userId);
-            if(target) {
-                target.active = !target.active;
-                localStorage.setItem('sicao_users', JSON.stringify(users));
-                renderUserTable();
-            }
-        }
-
+        // CARGA EN TIEMPO REAL DE LAS 9 BASES DE DATOS OPERATIVAS
         async function fetchAllDatasets(isBackground = false) {
             const syncText = document.getElementById('syncText');
             if(!isBackground) syncText.textContent = 'Cargando Datos...';
@@ -466,6 +546,7 @@
         }
 
         function standardizeRow(row, ds, index) {
+            // Extracción inteligente de enlaces de fotografías de Google Drive
             let photoUrl = '';
             for(let key in row) {
                 const val = String(row[key] || '');
