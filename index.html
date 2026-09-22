@@ -79,13 +79,13 @@
                     <!-- Campo Nombre (Solo Registro) -->
                     <div id="nameFieldGroup" class="hidden space-y-1">
                         <label class="text-xs font-semibold text-slate-300">Nombre Completo</label>
-                        <input type="text" id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. Alejandro García Espinoza">
+                        <input type="text" id="authName" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. juan perez perez">
                     </div>
 
                     <!-- Campo Usuario / Placa -->
                     <div class="space-y-1">
                         <label class="text-xs font-semibold text-slate-300">Usuario / Placa</label>
-                        <input type="text" id="authUser" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. 110543 o admin">
+                        <input type="text" id="authUser" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500 transition" placeholder="Ej. 110111 o admin">
                     </div>
 
                     <!-- Campos Adicionales Registro (Unidad y Rol) -->
@@ -133,7 +133,7 @@
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                     <div class="flex items-center space-x-2 text-indigo-400">
                         <i data-lucide="user-cog" class="w-5 h-5"></i>
-                        <h3 class="font-bold text-white text-lg">Usuarios Registrados en Google Sheets</h3>
+                        <h3 class="font-bold text-white text-lg">Usuarios Registrados</h3>
                     </div>
                     <button onclick="toggleAdminPanel()" class="text-slate-400 hover:text-white">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -144,7 +144,7 @@
                     <table class="w-full text-xs text-left text-slate-300">
                         <thead class="bg-slate-900 text-slate-400 uppercase font-mono">
                             <tr>
-                                <th class="p-3">Usuario / Placa</th>
+                                <th class="p-3">Usuario / Nomina</th>
                                 <th class="p-3">Nombre</th>
                                 <th class="p-3">Unidad</th>
                                 <th class="p-3">Rol</th>
